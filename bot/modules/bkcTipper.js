@@ -5,15 +5,15 @@ const bitcoin = require('bitcoin');
 let Regex = require('regex'),
   config = require('config'),
   spamchannels = config.get('moderation').botspamchannels;
-let walletConfig = config.get('pxc').config;
-let paytxfee = config.get('pxc').paytxfee;
-const pxc = new bitcoin.Client(walletConfig);
+let walletConfig = config.get('bkc').config;
+let paytxfee = config.get('bkc').paytxfee;
+const bkc = new bitcoin.Client(walletConfig);
 
-exports.commands = ['tippxc'];
-exports.tippxc = {
+exports.commands = ['tipbkc'];
+exports.tipbkc = {
   usage: '<subcommand>',
   description:
-    '__**Phoenixcoin (PXC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tippxc** : Displays This Message\n    **!tippxc balance** : get your balance\n    **!tippxc deposit** : get address for your deposits\n    **!tippxc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tippxc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tippxc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    has a default txfee of ' + paytxfee,
+    '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    has a default txfee of ' + paytxfee,
   process: async function(bot, msg, suffix) {
     let tipper = msg.author.id.replace('!', ''),
       words = msg.content
@@ -24,7 +24,7 @@ exports.tippxc = {
         }),
       subcommand = words.length >= 2 ? words[1] : 'help',
       helpmsg =
-        '__**Phoenixcoin (PXC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tippxc** : Displays This Message\n    **!tippxc balance** : get your balance\n    **!tippxc deposit** : get address for your deposits\n    **!tippxc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tippxc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tippxc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    **<> : Replace with appropriate value.**',
+        '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    **<> : Replace with appropriate value.**',
       channelwarning = 'Please use <#bot-spam> or DMs to talk to bots.';
     switch (subcommand) {
       case 'help':
@@ -33,6 +33,9 @@ exports.tippxc = {
       case 'balance':
         doBalance(msg, tipper);
         break;
+      case 'price':
+          getPrice(msg, tipper);
+          break;
       case 'deposit':
         privateorSpamChannel(msg, channelwarning, doDeposit, [tipper]);
         break;
@@ -44,7 +47,87 @@ exports.tippxc = {
     }
   }
 };
+//--Market Cap--
+function getPrice(message, tipper) {
+  var getmarketdata = getbkcprice()
+  message.channel.send({ embed: {
+    description: '**:bank::money_with_wings::moneybag:Briskcoin (BKC) Price!:moneybag::money_with_wings::bank:**',
+    color: 1363892,
+    fields: [
+      {
+        name: 'Current BKC/BTC price:',
+        value: '**'+ getmarketdata[0] + ' BTC' + '**',
+        inline: false
+      },
+      {
+        name: 'Current BKC/USD price:',
+        value: '**'+'$'+ getmarketdata[1] + '**',
+        inline: false
+      }
+    ]
+  } });
+}
 
+function getbkcprice(){
+  var arrresult = new Array();
+  arrresult = [];
+  //var coin_name = "widecoin";
+  //var coin_ticker = "wcn"
+  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var xmlHttp1 = new XMLHttpRequest();
+  var price1 = `http://api.briskcoin.org/getprice`;
+
+  xmlHttp1.open( "GET", price1, false ); // false for synchronous request
+  xmlHttp1.send( null );
+  var data1 = xmlHttp1.responseText;
+  var jsonres1 = JSON.parse(data1);
+  var checkprice1 = Object.keys(jsonres1).length;
+
+ if (checkprice1>0) {
+    arrresult[0] = (parseFloat(jsonres1.result.price_btc)).toFixed(8);
+    arrresult[1] = (parseFloat(jsonres1.result.price_usd)).toFixed(8);
+ }
+
+ return arrresult;
+
+}
+
+function getwcnprice_old(){
+  var arrresult = new Array();
+  arrresult = [];
+  var coin_name = "briskcoin";
+  var coin_ticker = "bkc"
+  var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+  var xmlHttp1 = new XMLHttpRequest();
+  var xmlHttp2 = new XMLHttpRequest();
+  var price1 = `https://api.coingecko.com/api/v3/simple/price?ids=${coin_name}&vs_currencies=usd,btc`;
+  var price2 = `https://api.coinpaprika.com/v1/ticker/${coin_ticker}-${coin_name}`;
+
+  xmlHttp1.open( "GET", price1, false ); // false for synchronous request
+  xmlHttp1.send( null );
+  var data1 = xmlHttp1.responseText;
+  var jsonres1 = JSON.parse(data1);
+  var checkprice1 = Object.keys(jsonres1).length;
+
+  xmlHttp2.open( "GET", price2, false ); 
+  xmlHttp2.send( null );
+  var data2 = xmlHttp2.responseText;
+  var jsonres2 = JSON.parse(data2);
+  var checkprice2 = Object.keys(jsonres2).length;
+
+  if (checkprice1>0){
+     //arrresult[0] = eval("jsonres1."+ coin_name + ".btc;")
+     //arrresult[1] = (parseFloat(jsonres1.bitcoin.usd)).toFixed(8);
+     arrresult[0] = eval("jsonres1."+ coin_name + ".btc;")
+     arrresult[1] = eval("jsonres1."+ coin_name + ".usd;")
+  } else if (checkprice2>0) {
+      arrresult[0] = (parseFloat(jsonres2.price_btc)).toFixed(8);
+      arrresult[1] = (parseFloat(jsonres2.price_usd)).toFixed(8);
+  }
+
+  return arrresult;
+}
+//--
 function privateorSpamChannel(message, wrongchannelmsg, fn, args) {
   if (!inPrivateorSpamChannel(message)) {
     message.reply(wrongchannelmsg);
@@ -58,12 +141,12 @@ function doHelp(message, helpmsg) {
 }
 
 function doBalance(message, tipper) {
-  pxc.getBalance(tipper, 1, function(err, balance) {
+  bkc.getBalance(tipper, 1, function(err, balance) {
     if (err) {
-      message.reply('Error getting Phoenixcoin (PXC) balance.').then(message => message.delete(10000));
+      message.reply('Error getting Briskcoin (BKC) balance.').then(message => message.delete(10000));
     } else {
     message.channel.send({ embed: {
-    description: '**:bank::money_with_wings::moneybag:Phoenixcoin (PXC) Balance!:moneybag::money_with_wings::bank:**',
+    description: '**:bank::money_with_wings::moneybag:Briskcoin (BKC) Balance!:moneybag::money_with_wings::bank:**',
     color: 1363892,
     fields: [
       {
@@ -85,10 +168,10 @@ function doBalance(message, tipper) {
 function doDeposit(message, tipper) {
   getAddress(tipper, function(err, address) {
     if (err) {
-      message.reply('Error getting your Phoenixcoin (PXC) deposit address.').then(message => message.delete(10000));
+      message.reply('Error getting your Briskcoin (BKC) deposit address.').then(message => message.delete(10000));
     } else {
     message.channel.send({ embed: {
-    description: '**:bank::card_index::moneybag:Phoenixcoin (PXC) Address!:moneybag::card_index::bank:**',
+    description: '**:bank::card_index::moneybag:Briskcoin (BKC) Address!:moneybag::card_index::bank:**',
     color: 1363892,
     fields: [
       {
@@ -117,24 +200,24 @@ function doWithdraw(message, tipper, words, helpmsg) {
     amount = getValidatedAmount(words[3]);
 
   if (amount === null) {
-    message.reply("I don't know how to withdraw that much Phoenixcoin (PXC)...").then(message => message.delete(10000));
+    message.reply("I don't know how to withdraw that much Briskcoin (BKC)...").then(message => message.delete(10000));
     return;
   }
 
-  pxc.getBalance(tipper, 1, function(err, balance) {
+  bkc.getBalance(tipper, 1, function(err, balance) {
     if (err) {
-      message.reply('Error getting Phoenixcoin (PXC) balance.').then(message => message.delete(10000));
+      message.reply('Error getting Briskcoin (BKC) balance.').then(message => message.delete(10000));
     } else {
       if (Number(amount) + Number(paytxfee) > Number(balance)) {
-        message.channel.send('Please leave atleast ' + paytxfee + ' Phoenixcoin (PXC) for transaction fees!');
+        message.channel.send('Please leave atleast ' + paytxfee + ' Briskcoin (BKC) for transaction fees!');
         return;
       }
-      pxc.sendFrom(tipper, address, Number(amount), function(err, txId) {
+      bkc.sendFrom(tipper, address, Number(amount), function(err, txId) {
         if (err) {
           message.reply(err.message).then(message => message.delete(10000));
         } else {
         message.channel.send({embed:{
-        description: '**:outbox_tray::money_with_wings::moneybag:Phoenixcoin (PXC) Transaction Completed!:moneybag::money_with_wings::outbox_tray:**',
+        description: '**:outbox_tray::money_with_wings::moneybag:Briskcoin (BKC) Transaction Completed!:moneybag::money_with_wings::outbox_tray:**',
         color: 1363892,
         fields: [
           {
@@ -185,16 +268,16 @@ function doTip(bot, message, tipper, words, helpmsg) {
   let amount = getValidatedAmount(words[amountOffset]);
 
   if (amount === null) {
-    message.reply("I don't know how to tip that much Phoenixcoin (PXC)...").then(message => message.delete(10000));
+    message.reply("I don't know how to tip that much Briskcoin (BKC)...").then(message => message.delete(10000));
     return;
   }
 
-  pxc.getBalance(tipper, 1, function(err, balance) {
+  bkc.getBalance(tipper, 1, function(err, balance) {
     if (err) {
-      message.reply('Error getting Phoenixcoin (PXC) balance.').then(message => message.delete(10000));
+      message.reply('Error getting Briskcoin (BKC) balance.').then(message => message.delete(10000));
     } else {
       if (Number(amount) + Number(paytxfee) > Number(balance)) {
-        message.channel.send('Please leave atleast ' + paytxfee + ' Phoenixcoin (PXC) for transaction fees!');
+        message.channel.send('Please leave atleast ' + paytxfee + ' Briskcoin (BKC) for transaction fees!');
         return;
       }
 
@@ -205,7 +288,7 @@ function doTip(bot, message, tipper, words, helpmsg) {
             return;
           }
       if (message.mentions.users.first().id) {
-        sendPXC(bot, message, tipper, message.mentions.users.first().id.replace('!', ''), amount, prv);
+        sendBKC(bot, message, tipper, message.mentions.users.first().id.replace('!', ''), amount, prv);
       } else {
         message.reply('Sorry, I could not find a user in your tip...').then(message => message.delete(10000));
       }
@@ -213,19 +296,19 @@ function doTip(bot, message, tipper, words, helpmsg) {
   });
 }
 
-function sendPXC(bot, message, tipper, recipient, amount, privacyFlag) {
+function sendBKC(bot, message, tipper, recipient, amount, privacyFlag) {
   getAddress(recipient.toString(), function(err, address) {
     if (err) {
       message.reply(err.message).then(message => message.delete(10000));
     } else {
-          pxc.sendFrom(tipper, address, Number(amount), 1, null, null, function(err, txId) {
+          bkc.sendFrom(tipper, address, Number(amount), 1, null, null, function(err, txId) {
               if (err) {
                 message.reply(err.message).then(message => message.delete(10000));
               } else {
                 if (privacyFlag) {
                   let userProfile = message.guild.members.find('id', recipient);
                   userProfile.user.send({ embed: {
-                  description: '**:money_with_wings::moneybag:Phoenixcoin (PXC) Transaction Completed!:moneybag::money_with_wings:**',
+                  description: '**:money_with_wings::moneybag:Briskcoin (BKC) Transaction Completed!:moneybag::money_with_wings:**',
                   color: 1363892,
                   fields: [
                     {
@@ -256,7 +339,7 @@ function sendPXC(bot, message, tipper, recipient, amount, privacyFlag) {
                   ]
                 } });
                 message.author.send({ embed: {
-                description: '**:money_with_wings::moneybag:Phoenixcoin (PXC) Transaction Completed!:moneybag::money_with_wings:**',
+                description: '**:money_with_wings::moneybag:Briskcoin (BKC) Transaction Completed!:moneybag::money_with_wings:**',
                 color: 1363892,
                 fields: [
                   {
@@ -288,13 +371,13 @@ function sendPXC(bot, message, tipper, recipient, amount, privacyFlag) {
                 ]
               } });
                   if (
-                    message.content.startsWith('!tippxc private ')
+                    message.content.startsWith('!tipbkc private ')
                   ) {
                     message.delete(1000); //Supposed to delete message
                   }
                 } else {
                   message.channel.send({ embed: {
-                  description: '**:money_with_wings::moneybag:Phoenixcoin (PXC) Transaction Completed!:moneybag::money_with_wings:**',
+                  description: '**:money_with_wings::moneybag:Briskcoin (BKC) Transaction Completed!:moneybag::money_with_wings:**',
                   color: 1363892,
                   fields: [
                     {
@@ -332,13 +415,13 @@ function sendPXC(bot, message, tipper, recipient, amount, privacyFlag) {
 }
 
 function getAddress(userId, cb) {
-  pxc.getAddressesByAccount(userId, function(err, addresses) {
+  bkc.getAddressesByAccount(userId, function(err, addresses) {
     if (err) {
       cb(err);
     } else if (addresses.length > 0) {
       cb(null, addresses[0]);
     } else {
-      pxc.getNewAddress(userId, function(err, address) {
+      bkc.getNewAddress(userId, function(err, address) {
         if (err) {
           cb(err);
         } else {
@@ -364,16 +447,16 @@ function isSpam(msg) {
 
 function getValidatedAmount(amount) {
   amount = amount.trim();
-  if (amount.toLowerCase().endsWith('pxc')) {
+  if (amount.toLowerCase().endsWith('bkc')) {
     amount = amount.substring(0, amount.length - 3);
   }
   return amount.match(/^[0-9]+(\.[0-9]+)?$/) ? amount : null;
 }
 
 function txLink(txId) {
-  return 'http://explorer.phoenixcoin.org/tx/' + txId;
+  return 'https://explorer.briskcoin.org/tx/' + txId;
 }
 
 function addyLink(address) {
-  return 'http://explorer.phoenixcoin.org/address/' + address;
+  return 'https://explorer.briskcoin.org/address/' + address;
 }
