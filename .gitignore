@@ -8,8 +8,6 @@ yarn-error.log*
 # dist
 dist/*
 #configuration
-config/default.json
-ecosystem.config.js
 
 # Runtime data
 pids
@@ -64,3 +62,5 @@ typings/
 .env
 bot/.DS_Store
 .DS_Store
+default.json
+ecosystem.config.js

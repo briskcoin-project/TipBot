@@ -15,12 +15,13 @@
     "numeral": "^2.0.6",
     "pm2": "^2.10.2",
     "regex": "^0.1.1",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
     "precommit": "prettier --single-quote true --write bot/**/*.js",
     "rebuild": "git pull origin master && npm install && update all",
-    "start":  "pm2 start ecosystem.config.js"
+    "start": "pm2 start ecosystem.config.js"
   },
   "devDependencies": {
     "prettier": "1.7.4"
