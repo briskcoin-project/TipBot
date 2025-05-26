@@ -12,7 +12,7 @@ exports.tiphelp = {
       '  **Briskcoin (BKC) Tipper**\n    Transaction Fees: **' + bkcFee + '**\n' +        
       '__**Commands**__\n' +
       '  **' + prefix + 'tipbkc** : Displays This Message\n' +
-      '  **' + prefix + 'tipbkc price** : get bkc price\n' +
+      '  **' + prefix + 'tipbkc price** : get BKC price\n' +
       '  **' + prefix + 'tipbkc balance** : get your balance\n' +
       '  **' + prefix + 'tipbkc deposit** : get address for your deposits\n' +
       '  **' + prefix + 'tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n' +
