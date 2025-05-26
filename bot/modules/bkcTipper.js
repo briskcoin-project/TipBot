@@ -13,7 +13,7 @@ exports.commands = ['tipbkc'];
 exports.tipbkc = {
   usage: '<subcommand>',
   description:
-    '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    has a default txfee of ' + paytxfee,
+    '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc price** : get BKC price\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    has a default txfee of ' + paytxfee,
   process: async function(bot, msg, suffix) {
     let tipper = msg.author.id.replace('!', ''),
       words = msg.content
@@ -24,7 +24,7 @@ exports.tipbkc = {
         }),
       subcommand = words.length >= 2 ? words[1] : 'help',
       helpmsg =
-        '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    **<> : Replace with appropriate value.**',
+        '__**Briskcoin (BKC) Tipper**__\nTransaction Fees: **' + paytxfee + '**\n    **!tipbkc** : Displays This Message\n    **!tipbkc balance** : get your balance\n    **!tipbkc price** : get BKC price\n    **!tipbkc deposit** : get address for your deposits\n    **!tipbkc withdraw <ADDRESS> <AMOUNT>** : withdraw coins to specified address\n    **!tipbkc <@user> <amount>** :mention a user with @ and then the amount to tip them\n    **!tipbkc private <user> <amount>** : put private before Mentioning a user to tip them privately.\n\n    **<> : Replace with appropriate value.**',
       channelwarning = 'Please use <#bot-spam> or DMs to talk to bots.';
     switch (subcommand) {
       case 'help':
@@ -51,7 +51,7 @@ exports.tipbkc = {
 function getPrice(message, tipper) {
   var getmarketdata = getbkcprice()
   message.channel.send({ embed: {
-    description: '**:bank::money_with_wings::moneybag:Briskcoin (BKC) Price!:moneybag::money_with_wings::bank:**',
+    description: ":bank:\u00A0Briskcoin (BKC) Price!\u00A0:bank:",
     color: 1363892,
     fields: [
       {
@@ -84,8 +84,8 @@ function getbkcprice(){
   var checkprice1 = Object.keys(jsonres1).length;
 
  if (checkprice1>0) {
-    arrresult[0] = (parseFloat(jsonres1.result.price_btc)).toFixed(8);
-    arrresult[1] = (parseFloat(jsonres1.result.price_usd)).toFixed(8);
+    arrresult[0] = (parseFloat(jsonres1.result.price_btc)).toFixed(10);
+    arrresult[1] = (parseFloat(jsonres1.result.price_usd)).toFixed(10);
  }
 
  return arrresult;
