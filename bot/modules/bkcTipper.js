@@ -75,7 +75,7 @@ function getbkcprice(){
   //var coin_ticker = "wcn"
   var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
   var xmlHttp1 = new XMLHttpRequest();
-  var price1 = `http://api.briskcoin.org/getprice`;
+  var price1 = `https://api.briskcoin.org/getprice`;
 
   xmlHttp1.open( "GET", price1, false ); // false for synchronous request
   xmlHttp1.send( null );
